@@ -1,6 +1,8 @@
 
 require "constants"
 
+CourseHandler = require "handlers.courseHandler"
+
 person = {x = 500, y = 500, size = 60, color = {1,1,0}}
 disc = {x=500,y=500, z=5,size=20, velocity = {0,0,0}, color={0,0,.75}}
 
@@ -8,6 +10,9 @@ STATE = THROWING
 
 function love.load()
 	love.graphics.setBackgroundColor(.5,.5,.5)
+	CourseHandler:init()
+	CourseHandler:loadTilesets()
+	CourseHandler:load()
 end
 
 function love.draw()
@@ -18,6 +23,8 @@ function love.draw()
 
 	love.graphics.push()
 	love.graphics.translate(x_translate_val, y_translate_val)
+
+	CourseHandler:draw()
 
 	love.graphics.print("Hello",400,400)
 
