@@ -1,5 +1,5 @@
 
-hole1 = {
+hole = {
 	
 	name = "Centennial Hole 1",
 	grid = {
@@ -41,4 +41,4 @@ hole1 = {
 	}
 }
 
-return hole1
+return hole

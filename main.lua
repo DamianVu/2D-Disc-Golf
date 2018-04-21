@@ -1,7 +1,9 @@
 
 require "constants"
+basket = love.graphics.newImage("images/sprites/Basket.png")
 
 CourseHandler = require "handlers.courseHandler"
+MenuHandler = require "handlers.menuhandler"
 
 person = {x = 500, y = 500, size = 60, color = {1,1,0}}
 disc = {x=500,y=500, z=5,size=20, velocity = {0,0,0}, glide = 7, color={0,0,.75}}
@@ -15,6 +17,8 @@ function love.load()
 	CourseHandler:init()
 	CourseHandler:loadTilesets()
 	CourseHandler:load()
+	MenuHandler:init()
+	MenuHandler:loadMenus()
 end
 
 function love.draw()

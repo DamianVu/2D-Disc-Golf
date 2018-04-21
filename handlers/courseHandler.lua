@@ -19,7 +19,6 @@ function coursehandler:loadTilesets()
 	for i = 1, #files do
 		local filename,_ = files[i]:match("(%a+).(.*)")
 		local currentTilesetIndex = #self.tilesets + 1
-		print("Test: "..currentTilesetIndex)
 		self.tilesets[currentTilesetIndex] = love.graphics.newImage("images/tilesets/"..filename..".png")
 		local currentQuadIndex = #self.quads + 1
 		self.quads[currentQuadIndex] = {}
@@ -34,7 +33,8 @@ function coursehandler:loadTilesets()
 end
 
 function coursehandler:load(course)
-	self.map = require "courses.centennial.hole1"
+	self.map = require "courses.centennial.hole2"
+	self.basket = love.graphics.newImage("images/sprites/Basket.png")
 end
 
 function coursehandler:draw()
@@ -46,6 +46,9 @@ function coursehandler:draw()
 			love.graphics.draw(self.tilesets[1], self.quads[1][self.map.grid[rowIndex][columnIndex]], x, y)
 		end
 	end
+
+	-- Draw the basket
+	love.graphics.draw(self.basket, (self.map.basket[1] - 1) * 64, (self.map.basket[2] - 1) * 64)
 end
 
 
