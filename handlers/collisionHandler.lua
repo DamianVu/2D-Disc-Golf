@@ -30,6 +30,14 @@ function collisionhandler:update(dt)
 			self.colliding = true
 		end
 	end
+
+	-- Check if level is over
+	if self:checkCollision(CourseHandler.map.basket) then
+		-- Trigger end of hole recap and move on
+		RecapHandler.postHole = true
+		STATE = RECAP
+
+	end
 end
 
 function collisionhandler:drawCollisionObjects()
@@ -50,18 +58,37 @@ function collisionhandler:drawObjectHeights()
 end
 
 function collisionhandler:checkCollision(object)
-	local objCenterX = object.x + object.size/2
-	local objCenterY = object.y + object.size/2
+	local objX
+	local objY
+	local objCenterX
+	local objCenterY
+	local oSize
+	local oHeight
+	if not object.x then
+		objCenterX, objCenterY = CourseHandler:getBasketPosition()
+		objX = objCenterX - 32
+		objY = objCenterY - 32
+		oSize = 64
+		oHeight = 6.5
+	else
+		objX = object.x
+		objY = object.y
+		objCenterX = object.x + object.size/2
+		objCenterY = object.y + object.size/2
+		oSize = object.size
+		oHeight = object.height
+	end
+
 	local sqrt = math.sqrt
 
 	local distanceBetweenCenters = sqrt(((objCenterX - disc.x) * (objCenterX - disc.x)) + ((objCenterY - disc.y) * (objCenterY - disc.y)))
-	local outerCircleRadius = sqrt(2 * (object.size * object.size))/2
+	local outerCircleRadius = sqrt(2 * (oSize * oSize))/2
 	if distanceBetweenCenters > outerCircleRadius + disc.size then
 		return false, -1
 	end
-	if (disc.z <= object.height) then
+	if (disc.z <= oHeight) then
 
-		local innerCircleRadius = object.size / 2
+		local innerCircleRadius = oSize / 2
 
 		
 
@@ -74,7 +101,7 @@ function collisionhandler:checkCollision(object)
 		local outerX = math.cos(angleFromDiscToObj) * disc.size
 		local outerY = math.sin(angleFromDiscToObj) * disc.size
 
-		if outerX >= object.x and outerX <= object.x + object.size and outerY >= object.y and outerY <= object.y + object.size then
+		if outerX >= objX and outerX <= objX + oSize and outerY >= objY and outerY <= objY + oSize then
 			return true, 2
 		else
 			return false, -1

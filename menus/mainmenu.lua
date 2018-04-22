@@ -3,7 +3,7 @@ mainmenu = {
 	name = "main",
 	options = {
 		{"Play", startRound},
-		{"View Highscores", highscores},
+		--{"View Highscores", highscores},
 		{"Quit", closeGame}
 	}
 }

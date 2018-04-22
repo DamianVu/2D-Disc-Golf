@@ -35,19 +35,22 @@ function menuhandler:draw()
 		for i = 1, #options do
 			local item = options[i][1]
 			local w, h = love.graphics.getDimensions()
-			if i == self.selection then
+			love.graphics.setNewFont(24)
+			if i ~= self.selection then
 				love.graphics.setColor(0,0,.3)
-				love.graphics.print(item, w/2 - 101, h/4 + offset - 1)
-				love.graphics.print(item, w/2 - 101, h/4 + offset + 1)
-				love.graphics.print(item, w/2 - 99, h/4 + offset - 1)
-				love.graphics.print(item, w/2 - 99, h/4 + offset + 1)
+				love.graphics.print(item, w/2 - 51, h/3 + offset - 1)
+				love.graphics.print(item, w/2 - 51, h/3 + offset + 1)
+				love.graphics.print(item, w/2 - 49, h/3 + offset - 1)
+				love.graphics.print(item, w/2 - 49, h/3 + offset + 1)
 			end
 			love.graphics.setColor(.9373, .9373, .9373)
-			love.graphics.print(item, w/2 - 100, h/4 + offset)
+			love.graphics.print(item, w/2 - 50, h/3 + offset)
 			offset = offset + 60
 		end
-	elseif self.currentMenu == "highscores" then
 
+		love.graphics.setColor(.9,.9,0)
+		love.graphics.setNewFont(40)
+		love.graphics.print("Use 'WASD' or Arrow Keys, then 'Enter' to select!", 700, 800, -math.pi/6)
 	end
 end
 

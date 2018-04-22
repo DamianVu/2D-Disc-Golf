@@ -9,6 +9,7 @@ RoundHandler = require "handlers.roundhandler"
 CollisionHandler = require "handlers.collisionHandler"
 RecapHandler = require "handlers.recapHandler"
 DebugHandler = require "handlers.debugHandler"
+ScorecardHandler = require "handlers.scorecardHandler"
 
 person = {x = 500, y = 500, size = 60, color = {1,1,0}}
 disc = {x = 850, y = 500, z = 5, size = 20, noseAngle = 0, velocity = {0,0,0}, fade = 5, glide = 7, turn = -1, color = {0,0,.75}}
@@ -36,13 +37,15 @@ function love.load()
 	love.graphics.setBackgroundColor(.5,.5,.5)
 	CourseHandler:init()
 	CourseHandler:loadTilesets()
-	CourseHandler:load()
 	MenuHandler:init()
 	MenuHandler:loadMenus()
 	CollisionHandler:init()
 	CollisionHandler:default()
 	RecapHandler:init()
 	RecapHandler:default()
+	RoundHandler:initialize()
+	ScorecardHandler:init()
+	ScorecardHandler:default()
 
 	-- Add objects to collision handler
 	testColObj1 = {x = 64, y = 64, size = 64, height = 50}
@@ -55,8 +58,6 @@ function love.load()
 	CollisionHandler:addObject(testColObj3)
 	CollisionHandler:addObject(testColObj4)
 	CollisionHandler:addObject(testColObj5)
-
-	CollisionHandler:update()
 
 
 	w = love.graphics.getWidth()
@@ -73,7 +74,7 @@ function love.draw()
 		love.graphics.translate(x_translate_val, y_translate_val)
 		love.graphics.scale(zoomFactor)
 
-		CourseHandler:draw()
+		RoundHandler:draw()
 
 		CollisionHandler:drawCollisionObjects()
 		CollisionHandler:drawObjectHeights()
@@ -94,13 +95,13 @@ function love.draw()
 		--stroke counter stuff
 		----background
 		love.graphics.setColor(1, .5, 1)
-		love.graphics.rectangle("fill", 1521, 820, 79, 80)
+		love.graphics.rectangle("fill", 1500, 800, 100, 100)
 		----words
 		love.graphics.setColor(.25, 0, .95)
-		love.graphics.print("# of Strokes", 1523, 820)
+		love.graphics.print("# of Strokes", 1500, 800)
 		----stroke number
 		love.graphics.setNewFont(70)
-		love.graphics.print(numOfStrokes, 1540, 825)
+		love.graphics.print(numOfStrokes, 1505, 820)
 		love.graphics.setNewFont(12)
 
 		if STATE == THROWING then
@@ -131,6 +132,27 @@ function love.draw()
 		if STATE == RECAP then
 			RecapHandler:draw()
 		end
+
+		if STATE == PAUSED then
+			ScorecardHandler:draw()
+			love.graphics.setNewFont(40)
+			love.graphics.setColor(0,0,.3)
+			if pauseMenuItem == 2 then
+				love.graphics.print("Resume (Esc)", w/2 - 131, h/2 + 101)
+				love.graphics.print("Resume (Esc)", w/2 - 129, h/2 + 101)
+				love.graphics.print("Resume (Esc)", w/2 - 131, h/2 + 99)
+				love.graphics.print("Resume (Esc)", w/2 - 129, h/2 + 99)
+			else
+				love.graphics.print("Quit", w/2 - 49, h/2 + 201)
+				love.graphics.print("Quit", w/2 - 51, h/2 + 201)
+				love.graphics.print("Quit", w/2 - 49, h/2 + 199)
+				love.graphics.print("Quit", w/2 - 51, h/2 + 199)
+			end
+
+			love.graphics.setColor(1,1,1)
+			love.graphics.print("Resume (Esc)", w/2 - 130, h/2 + 100)
+			love.graphics.print("Quit", w/2 - 50, h/2 + 200)
+		end
 	else
 		love.graphics.setNewFont(24)
 		MenuHandler:draw()
@@ -153,7 +175,7 @@ function love.update(dt)
 			disc.x = disc.x + modx * disc.velocity[2] * dt
 			disc.y = disc.y + mody * disc.velocity[2] * dt
 
-			disc.velocity[2] = disc.velocity[2] - math.sqrt(disc.velocity[2]) * dt
+			disc.velocity[2] = disc.velocity[2] - math.sqrt(disc.velocity[2]) * 2 * dt
 			if disc.velocity[2] < 0 then disc.velocity[2] = 0 end
 
 			disc.z = disc.z + disc.velocity[3] * dt
@@ -171,8 +193,9 @@ function love.update(dt)
 			-- We want the disc to hyzer more based on how slow it is traveling compounded with its turn value
 			-- Higher turn value means that it doesn't flip much, and thus most overstable.
 
-
-			disc.velocity[1] = disc.velocity[1]
+			if disc.velocity[2] < initialSpeed * .8 then
+				disc.velocity[1] = disc.velocity[1] - dt/2
+			end
 
 			-- Normalize Disc Velocity vector to stay between -pi and pi
 			if disc.velocity[1] < -math.pi then
@@ -293,6 +316,58 @@ function love.keypressed(key)
 			love.event.quit()
 		end
 	end
+
+	if STATE == RECAP then
+		if key == "space" then
+			RecapHandler.skip = true
+		end
+	end
+
+
+	if STATE ~= MAINMENU and key == "escape" then
+		if STATE == PAUSED then
+			STATE = prevState
+		else
+			prevState = STATE
+			pauseMenuItem = 1
+			STATE = PAUSED
+			ScorecardHandler:updateOnce()
+		end
+	end
+
+	if STATE == PAUSED then
+		if key == "w" or key == "up" or key == "s" or key == "down" then
+			if pauseMenuItem == 1 then pauseMenuItem = 2 else pauseMenuItem = 1 end
+		end
+
+		if key == "return" then
+			if pauseMenuItem == 1 then
+				STATE = prevState
+			else
+				person = {x = 500, y = 500, size = 60, color = {1,1,0}}
+				disc = {x = 850, y = 500, z = 5, size = 20, noseAngle = 0, velocity = {0,0,0}, fade = 5, glide = 7, turn = -1, color = {0,0,.75}}
+				powerBar = {y = 800, speed = 120, direction = "up"}
+				heightBar = {y = 840, speed = 120, direction = "up"}
+				throwingChoice = "power"
+				numOfStrokes = 0
+				initialThrowAngle = 0
+				mouse = {angle = 0, length = 200}
+				x_translate_val = 0
+				y_translate_val = 0
+
+				timeFlying = 0
+				timeGuess = 0
+
+				zoomFactor = 1
+
+				initialDirection = 0
+				finalDirection = 0
+
+				STATE = MAINMENU
+				currentDisc = "Driver"
+			end
+		end
+	end
 end
 
 function love.mousepressed(x,y,button)
@@ -330,8 +405,9 @@ function love.mousepressed(x,y,button)
 
 		disc.velocity = {direction, discSpeed, zVel}
 		initialDirection = direction
+		initialSpeed = discSpeed
 	end
-	if STATE == RECAP and button == 1 and RecapHandler.finalMessage then
+	if STATE == RECAP and button == 1 then
 		RecapHandler.skip = true
 	end
 end

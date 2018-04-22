@@ -16,6 +16,7 @@ end
 function debughandler:draw()
 	if self.showDebug then
 		love.graphics.setNewFont(12)
+		love.graphics.setColor(1,1,1)
 		love.graphics.print("Disc Z: "..disc.z,10,10)
 		love.graphics.print("STATE: "..STATE, 10, 30)
 		love.graphics.print("Disc Location: "..disc.x..", "..disc.y, 10, 50)
