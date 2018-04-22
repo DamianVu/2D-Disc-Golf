@@ -105,25 +105,32 @@ function love.draw()
 		love.graphics.setNewFont(12)
 
 		if STATE == THROWING then
+			--background boarder
+			love.graphics.setColor(person.color)
+			love.graphics.rectangle("fill", 0, 770, 5, 130)
+			love.graphics.rectangle("fill", 160, 770, 5, 130)
+			love.graphics.rectangle("fill", 5, 770, 155, 5)
+			love.graphics.rectangle("fill", 5, 895, 155, 5)
+
 			--background rectangle
-			love.graphics.setColor(1, .5, 1)
-			love.graphics.rectangle("fill", 0, 730, 155, 120)
+			love.graphics.setColor(.5, .5, .5)
+			love.graphics.rectangle("fill", 5, 775, 155, 120)
 
 			--powerBar
 			love.graphics.setColor(.25, 0, .95)
-			love.graphics.print("Power Bar", 10, 730)
-			love.graphics.rectangle("fill", 10, 750, 35, 100)
+			love.graphics.print("Power Bar", 15, 775)
+			love.graphics.rectangle("fill", 15, 795, 35, 100)
 
 			love.graphics.setColor(.43, .95, .53)
-			love.graphics.rectangle("fill", 10, powerBar.y, 35, 10)
+			love.graphics.rectangle("fill", 15, powerBar.y, 35, 10)
 
 			--heightBar
 			love.graphics.setColor(.25, 0, .95)
-			love.graphics.print("Height Bar", 90, 730)
-			love.graphics.rectangle("fill", 90, 750, 35, 100)
+			love.graphics.print("Height Bar", 95, 775)
+			love.graphics.rectangle("fill", 95, 795, 35, 100)
 
 			love.graphics.setColor(.43, .95, .53)
-			love.graphics.rectangle("fill", 90, heightBar.y, 35, 10)
+			love.graphics.rectangle("fill", 95, heightBar.y, 35, 10)
 
 			love.graphics.setColor(1, 1, 1)
 			love.graphics.line(w/2, h/2, mouse.drawX, mouse.drawY)
@@ -186,7 +193,7 @@ function love.update(dt)
 			else
 				disc.velocity[3] = disc.velocity[3] - GRAVITY * dt
 			end
-			
+
 
 
 			-- Make the disc Hyzer
@@ -230,10 +237,10 @@ function love.update(dt)
 			mouse.drawY = h/2 + math.sin(mouse.angle) * mouse.length
 
 			if throwingChoice == "power" then
-				if powerBar.y > 840 then
+				if powerBar.y > 885 then
 					powerBar.y = powerBar.y - powerBar.speed * dt
 					powerBar.direction = "down"
-				elseif powerBar.y < 750 then
+				elseif powerBar.y < 795 then
 					powerBar.y = powerBar.y + powerBar.speed * dt
 					powerBar.direction = "up"
 				else
@@ -244,10 +251,10 @@ function love.update(dt)
 					end
 		 		end
 			elseif throwingChoice == "height" then
-				if heightBar.y > 840 then
+				if heightBar.y > 885 then
 					heightBar.y = heightBar.y - heightBar.speed * dt
 					heightBar.direction = "down"
-				elseif heightBar.y < 750 then
+				elseif heightBar.y < 795 then
 					heightBar.y = heightBar.y + heightBar.speed * dt
 					heightBar.direction = "up"
 				else
@@ -385,16 +392,16 @@ function love.mousepressed(x,y,button)
 
 		local direction = math.atan2(relY - disc.y, relX - disc.x)
 
-		local releaseSpeed = abs(powerBar.y - 850) -- Will range from 10-100
+		local releaseSpeed = abs(powerBar.y - 895) -- Will range from 10-100
 
-		local zVel = abs(heightBar.y - 840) / 90 -- Will range from 0 - 100
+		local zVel = abs(heightBar.y - 885) / 90 -- Will range from 0 - 100
 
 		-- The height will be the height above throwing it flat.
 		-- There is no point in throwing straight up and down, so we will say we can throw it at a max of 80 degrees above flat.
 		local releaseAngle = zVel * (math.pi / 2)* 8 / 9
 
 		-- This is really tough because we don't factor in drag...
-		-- Now we factor in the disc speed... 
+		-- Now we factor in the disc speed...
 		-- We want the disc to have the longest flight when it is thrown at 45 degrees?
 		zVel = math.sin(releaseAngle) * releaseSpeed
 
