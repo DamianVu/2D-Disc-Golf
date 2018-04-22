@@ -1,9 +1,11 @@
 
 require "constants"
+require "handlers.menuHelperFunctions"
 basket = love.graphics.newImage("images/sprites/Basket.png")
 
 CourseHandler = require "handlers.courseHandler"
 MenuHandler = require "handlers.menuhandler"
+RoundHandler = require "handlers.roundhandler"
 
 person = {x = 500, y = 500, size = 60, color = {1,1,0}}
 disc = {x=500,y=500, z=5, size=20, velocity = {0,0,0}, glide = 7, color={0,0,.75}}
@@ -16,7 +18,7 @@ mouse = {angle = 0, length = 200}
 x_translate_val = 0
 y_translate_val = 0
 
-STATE = THROWING
+STATE = MAINMENU
 currentDisc = "Driver"
 
 function love.load()
@@ -30,7 +32,7 @@ end
 
 function love.draw()
 
-
+	if STATE ~= MAINMENU then
 	x_translate_val = (love.graphics.getWidth() / 2) - disc.x
 	y_translate_val = (love.graphics.getHeight() / 2) - disc.y
 
@@ -76,10 +78,16 @@ function love.draw()
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.line(800, 450, 800 + math.cos(mouse.angle) * mouse.length, 450 + math.sin(mouse.angle) * mouse.length)
 	end
+	else
+		love.graphics.setNewFont(24)
+		MenuHandler:draw()
+		love.graphics.setNewFont(12)
+		love.graphics.print("Selection: "..MenuHandler.selection, 10, 10)
+	end
 end
 
 function love.update(dt)
-
+if STATE ~= MAINMENU then
 	if STATE == FLYING then
 		local modx = math.cos(disc.velocity[1])
 		local mody = math.sin(disc.velocity[1])
@@ -151,7 +159,7 @@ function love.update(dt)
 		end
 
 	end
-
+end
 end
 
 function love.keypressed(key)
@@ -170,6 +178,21 @@ function love.keypressed(key)
 			disc.color = {.5,0, .6}
 			currentDisc = "Putter"
 			disc.glide = 1
+		end
+	end
+
+	if STATE == MAINMENU then
+		if key == "up" or key == "w" then
+			MenuHandler:changeSelection(true)
+		end
+		if key == "down" or key == "s" then
+			MenuHandler:changeSelection(false)
+		end
+		if key == "return" then
+			MenuHandler:selectOption()
+		end
+		if key == "escape" then
+			love.event.quit()
 		end
 	end
 end

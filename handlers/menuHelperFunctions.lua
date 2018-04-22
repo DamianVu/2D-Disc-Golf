@@ -1,6 +1,6 @@
 
 function startRound()
-	roundHandler:start()
+	RoundHandler:start()
 end
 
 function highscores()
