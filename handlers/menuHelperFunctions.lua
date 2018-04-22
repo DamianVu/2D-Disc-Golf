@@ -1,6 +1,7 @@
 
 function startRound()
-	RoundHandler:start()
+	--RoundHandler:start()
+	STATE = THROWING
 end
 
 function highscores()

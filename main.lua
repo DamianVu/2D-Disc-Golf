@@ -33,51 +33,51 @@ end
 function love.draw()
 
 	if STATE ~= MAINMENU then
-	x_translate_val = (love.graphics.getWidth() / 2) - disc.x
-	y_translate_val = (love.graphics.getHeight() / 2) - disc.y
+		x_translate_val = (love.graphics.getWidth() / 2) - disc.x
+		y_translate_val = (love.graphics.getHeight() / 2) - disc.y
 
-	love.graphics.push()
-	love.graphics.translate(x_translate_val, y_translate_val)
+		love.graphics.push()
+		love.graphics.translate(x_translate_val, y_translate_val)
 
-	CourseHandler:draw()
+		CourseHandler:draw()
 
-	love.graphics.print("Hello",400,400)
+		love.graphics.print("Hello",400,400)
 
-	love.graphics.setColor(disc.color)
-	love.graphics.circle("fill", disc.x - disc.size/2, disc.y - disc.size/2, disc.size + disc.z/2)
+		love.graphics.setColor(disc.color)
+		love.graphics.circle("fill", disc.x - disc.size/2, disc.y - disc.size/2, disc.size + disc.z/2)
 
-	love.graphics.setColor(person.color)
-	love.graphics.rectangle("fill", person.x - person.size/2, person.y - person.size/2, person.size, person.size)
+		love.graphics.setColor(person.color)
+		love.graphics.rectangle("fill", person.x - person.size/2, person.y - person.size/2, person.size, person.size)
 
-	love.graphics.pop()
+		love.graphics.pop()
 
 
-	love.graphics.print("Disc Z: "..disc.z,10,10)
-	love.graphics.print("STATE: "..STATE, 10, 30)
-	love.graphics.print("Disc Location: "..disc.x..", "..disc.y, 10, 50)
-	love.graphics.print("Disc Selection: "..currentDisc, 10, 70)
-	love.graphics.print("Disc Angle: "..disc.velocity[1], 10, 90)
-	love.graphics.print("Hyzer Angle: "..hyzerAngle, 10, 110)
-	love.graphics.print("Disc Height: "..disc.z, 10, 130)
+		love.graphics.print("Disc Z: "..disc.z,10,10)
+		love.graphics.print("STATE: "..STATE, 10, 30)
+		love.graphics.print("Disc Location: "..disc.x..", "..disc.y, 10, 50)
+		love.graphics.print("Disc Selection: "..currentDisc, 10, 70)
+		love.graphics.print("Disc Angle: "..disc.velocity[1], 10, 90)
+		love.graphics.print("Hyzer Angle: "..hyzerAngle, 10, 110)
+		love.graphics.print("Disc Height: "..disc.z, 10, 130)
 
-	if STATE == THROWING then
-		love.graphics.setColor(.43, .95, .53)
-		love.graphics.print("Power Bar", 10, 730)
-		love.graphics.rectangle("fill", 10, 750, 35, 100)
+		if STATE == THROWING then
+			love.graphics.setColor(.43, .95, .53)
+			love.graphics.print("Power Bar", 10, 730)
+			love.graphics.rectangle("fill", 10, 750, 35, 100)
 
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.rectangle("fill", 10, powerBar.y, 35, 10)
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 10, powerBar.y, 35, 10)
 
-		love.graphics.setColor(.25, 0, .95)
-		love.graphics.print("Height Bar", 90, 730)
-		love.graphics.rectangle("fill", 90, 750, 35, 100)
+			love.graphics.setColor(.25, 0, .95)
+			love.graphics.print("Height Bar", 90, 730)
+			love.graphics.rectangle("fill", 90, 750, 35, 100)
 
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.rectangle("fill", 90, heightBar.y, 35, 10)
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 90, heightBar.y, 35, 10)
 
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.line(800, 450, 800 + math.cos(mouse.angle) * mouse.length, 450 + math.sin(mouse.angle) * mouse.length)
-	end
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.line(800, 450, 800 + math.cos(mouse.angle) * mouse.length, 450 + math.sin(mouse.angle) * mouse.length)
+		end
 	else
 		love.graphics.setNewFont(24)
 		MenuHandler:draw()
@@ -87,85 +87,85 @@ function love.draw()
 end
 
 function love.update(dt)
-if STATE ~= MAINMENU then
-	if STATE == FLYING then
-		local modx = math.cos(disc.velocity[1])
-		local mody = math.sin(disc.velocity[1])
+	if STATE ~= MAINMENU then
+		if STATE == FLYING then
+			local modx = math.cos(disc.velocity[1])
+			local mody = math.sin(disc.velocity[1])
 
-		disc.x = disc.x + BASESPEED * modx * disc.velocity[2] * dt
-		disc.y = disc.y + BASESPEED * mody * disc.velocity[2] * dt
+			disc.x = disc.x + BASESPEED * modx * disc.velocity[2] * dt
+			disc.y = disc.y + BASESPEED * mody * disc.velocity[2] * dt
 
-		disc.velocity[2] = disc.velocity[2] - disc.velocity[2] * .1 * dt
+			disc.velocity[2] = disc.velocity[2] - disc.velocity[2] * .1 * dt
 
-		disc.z = disc.z + disc.velocity[3] * dt
-		disc.velocity[3] = disc.velocity[3] - GRAVITY / (disc.glide / 7 * 2) * dt
-
-		--making the disc Hiezer
-		if hyzerAngle > 180 then
-			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-			hyzerAngle = hyzerAngle + .5 * hyzerAngle * dt
 			disc.z = disc.z + disc.velocity[3] * dt
-		elseif hyzerAngle > 90 then
-			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-			hyzerAngle = hyzerAngle + .8 * hyzerAngle * dt
-		elseif hyzerAngle > 30 then
-			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-			hyzerAngle = hyzerAngle + 1 * hyzerAngle * dt
-		else
-			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-			hyzerAngle = hyzerAngle + 1.5 * hyzerAngle * dt
-		end
+			disc.velocity[3] = disc.velocity[3] - GRAVITY / (disc.glide / 7 * 2) * dt
 
-
-		if disc.z < 0 then
-			disc.z = 5
-			STATE = THROWING
-			hyzerAngle = .5
-			person.x = disc.x
-			person.y = disc.y
-		end
-	end
-
-	if STATE == THROWING then
-		local x, y = love.mouse.getPosition()
-
-		local relX = x - x_translate_val
-		local relY = y - y_translate_val
-
-		mouse.angle = math.atan2(relY - person.y, relX - person.x)
-
-		if throwingChoice == "power" then
-			if powerBar.y > 840 then
-				powerBar.y = powerBar.y - powerBar.speed * dt
-				powerBar.direction = "down"
-			elseif powerBar.y < 750 then
-				powerBar.y = powerBar.y + powerBar.speed * dt
-				powerBar.direction = "up"
+			--making the disc Hiezer
+			if hyzerAngle > 180 then
+				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
+				hyzerAngle = hyzerAngle + .5 * hyzerAngle * dt
+				disc.z = disc.z + disc.velocity[3] * dt
+			elseif hyzerAngle > 90 then
+				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
+				hyzerAngle = hyzerAngle + .8 * hyzerAngle * dt
+			elseif hyzerAngle > 30 then
+				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
+				hyzerAngle = hyzerAngle + 1 * hyzerAngle * dt
 			else
-				if powerBar.direction == "up" then
-					powerBar.y = powerBar.y + powerBar.speed * dt
-				else
+				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
+				hyzerAngle = hyzerAngle + 1.5 * hyzerAngle * dt
+			end
+
+
+			if disc.z < 0 then
+				disc.z = 5
+				STATE = THROWING
+				hyzerAngle = .5
+				person.x = disc.x
+				person.y = disc.y
+			end
+		end
+
+		if STATE == THROWING then
+			local x, y = love.mouse.getPosition()
+
+			local relX = x - x_translate_val
+			local relY = y - y_translate_val
+
+			mouse.angle = math.atan2(relY - person.y, relX - person.x)
+
+			if throwingChoice == "power" then
+				if powerBar.y > 840 then
 					powerBar.y = powerBar.y - powerBar.speed * dt
-				end
-	 		end
-		else
-			if heightBar.y > 840 then
-				heightBar.y = heightBar.y - heightBar.speed * dt
-				heightBar.direction = "down"
-			elseif heightBar.y < 750 then
-				heightBar.y = heightBar.y + heightBar.speed * dt
-				heightBar.direction = "up"
-			else
-				if heightBar.direction == "up" then
-					heightBar.y = heightBar.y + heightBar.speed * dt
+					powerBar.direction = "down"
+				elseif powerBar.y < 750 then
+					powerBar.y = powerBar.y + powerBar.speed * dt
+					powerBar.direction = "up"
 				else
+					if powerBar.direction == "up" then
+						powerBar.y = powerBar.y + powerBar.speed * dt
+					else
+						powerBar.y = powerBar.y - powerBar.speed * dt
+					end
+		 		end
+			else
+				if heightBar.y > 840 then
 					heightBar.y = heightBar.y - heightBar.speed * dt
-				end
-	 		end
-		end
+					heightBar.direction = "down"
+				elseif heightBar.y < 750 then
+					heightBar.y = heightBar.y + heightBar.speed * dt
+					heightBar.direction = "up"
+				else
+					if heightBar.direction == "up" then
+						heightBar.y = heightBar.y + heightBar.speed * dt
+					else
+						heightBar.y = heightBar.y - heightBar.speed * dt
+					end
+		 		end
+			end
 
+		end
 	end
-end
 end
 
 function love.keypressed(key)
