@@ -36,11 +36,10 @@ function roundhandler:moveOn(strokes)
 	self.strokes = self.strokes + strokes
 	numOfStrokes = 0
 	if self.currentHole ~= self.totalHoles then
-		print("Attempting to move on")
 		self.currentHole = self.currentHole + 1
 		CourseHandler:setHole(self.currentHole)
+		self.canvas = CourseHandler:createCanvas()
 	else
-		print("Fuck")
 		STATE = MAINMENU
 	end
 end

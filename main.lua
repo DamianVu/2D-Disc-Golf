@@ -238,9 +238,11 @@ function love.update(dt)
 
 			if throwingChoice == "power" then
 				if powerBar.y > 885 then
+					powerBar.y = 885
 					powerBar.y = powerBar.y - powerBar.speed * dt
 					powerBar.direction = "down"
 				elseif powerBar.y < 795 then
+					powerBar.y = 795
 					powerBar.y = powerBar.y + powerBar.speed * dt
 					powerBar.direction = "up"
 				else
@@ -252,9 +254,11 @@ function love.update(dt)
 		 		end
 			elseif throwingChoice == "height" then
 				if heightBar.y > 885 then
+					heightBar.y = 885
 					heightBar.y = heightBar.y - heightBar.speed * dt
 					heightBar.direction = "down"
 				elseif heightBar.y < 795 then
+					heightBar.y = 795
 					heightBar.y = heightBar.y + heightBar.speed * dt
 					heightBar.direction = "up"
 				else
