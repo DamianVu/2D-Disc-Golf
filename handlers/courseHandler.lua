@@ -38,10 +38,31 @@ function coursehandler:load(course)
 end
 
 function coursehandler:draw()
-
 	love.graphics.setColor(1,1,1,1)
-	for rowIndex = 1, #self.map.grid do
-		for columnIndex = 1, #self.map.grid[rowIndex] do
+
+	-- Calculate current view
+	local rowStartIndex
+	local rowEndIndex
+	local colStartIndex
+	local colEndIndex
+
+	local ceil = math.ceil
+	local floor = math.floor
+
+	rowStartIndex = floor(-y_translate_val / 64)
+	if rowStartIndex < 1 then rowStartIndex = 1 end
+	colStartIndex = floor(-x_translate_val / 64)
+	if colStartIndex < 1 then colStartIndex = 1 end
+
+	rowEndIndex = floor((((rowStartIndex * 64) + h) / zoomFactor) / 64) + 2
+	colEndIndex = floor((((colStartIndex * 64) + w) / zoomFactor) / 64) + 2
+	if rowEndIndex > #self.map.grid then rowEndIndex = #self.map.grid end
+
+
+	for rowIndex = rowStartIndex, rowEndIndex do
+		local eInd = colEndIndex
+		if eInd > #self.map.grid[rowIndex] then eInd = #self.map.grid[rowIndex] end
+		for columnIndex = colStartIndex, eInd do
 			local x, y = ((columnIndex - 1) * 64), ((rowIndex - 1) * 64)
 			love.graphics.draw(self.tilesets[1], self.quads[1][self.map.grid[rowIndex][columnIndex]], x, y)
 		end

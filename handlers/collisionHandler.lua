@@ -36,10 +36,7 @@ function collisionhandler:drawCollisionObjects()
 	for i = 1, #self.objects do
 		local o = self.objects[i]
 		love.graphics.setColor(1,0,0)
-		if self.colliding then love.graphics.setColor(0,1,0) end
 		love.graphics.rectangle("line", o.x, o.y, o.size, o.size)
-		love.graphics.setColor(1,1,0)
-		love.graphics.circle("line", o.x + o.size/2, o.y + o.size/2, math.sqrt(2 * (o.size * o.size))/2)
 	end
 end
 
@@ -53,18 +50,22 @@ function collisionhandler:drawObjectHeights()
 end
 
 function collisionhandler:checkCollision(object)
-	if (disc.z <= object.height) then
-		local objCenterX = object.x + object.size/2
-		local objCenterY = object.y + object.size/2
+	local objCenterX = object.x + object.size/2
+	local objCenterY = object.y + object.size/2
+	local sqrt = math.sqrt
 
-		local outerCircleRadius = math.sqrt(2 * (object.size * object.size))/2
+	local distanceBetweenCenters = sqrt(((objCenterX - disc.x) * (objCenterX - disc.x)) + ((objCenterY - disc.y) * (objCenterY - disc.y)))
+	local outerCircleRadius = sqrt(2 * (object.size * object.size))/2
+	if distanceBetweenCenters > outerCircleRadius + disc.size then
+		return false, -1
+	end
+	if (disc.z <= object.height) then
+
 		local innerCircleRadius = object.size / 2
 
-		local distanceBetweenCenters = math.sqrt(((objCenterX - disc.x) * (objCenterX - disc.x)) + ((objCenterY - disc.y) * (objCenterY - disc.y)))
+		
 
-		if distanceBetweenCenters > outerCircleRadius + disc.size then
-			return false, -1
-		end
+		
 		if distanceBetweenCenters < innerCircleRadius + disc.size then
 			return true, 1
 		end
