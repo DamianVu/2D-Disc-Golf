@@ -51,6 +51,10 @@ function menuhandler:draw()
 		love.graphics.setColor(.9,.9,0)
 		love.graphics.setNewFont(40)
 		love.graphics.print("Use 'WASD' or Arrow Keys, then 'Enter' to select!", 700, 800, -math.pi/6)
+
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.setNewFont(100)
+		love.graphics.print("Disc Golf 2-D", 480, 100)
 	end
 end
 
