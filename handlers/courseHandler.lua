@@ -51,6 +51,10 @@ function coursehandler:draw()
 	love.graphics.draw(self.basket, (self.map.basket[1] - 1) * 64, (self.map.basket[2] - 1) * 64)
 end
 
+function coursehandler:getBasketPosition()
+	return ((self.map.basket[1] - 1) * 64) + 32, ((self.map.basket[2] - 1) * 64) + 32
+end
+
 
 
 return coursehandler

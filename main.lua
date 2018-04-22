@@ -7,18 +7,26 @@ CourseHandler = require "handlers.courseHandler"
 MenuHandler = require "handlers.menuhandler"
 RoundHandler = require "handlers.roundhandler"
 CollisionHandler = require "handlers.collisionHandler"
+RecapHandler = require "handlers.recapHandler"
 
 person = {x = 500, y = 500, size = 60, color = {1,1,0}}
-disc = {x=500,y=500, z=5, size=20, velocity = {0,0,0}, glide = 7, color={0,0,.75}}
+disc = {x = 500 , y = 500, z = 5, size = 20, noseAngle = 0, velocity = {0,0,0}, fade = 5, glide = 7, turn = -1, color = {0,0,.75}}
 powerBar = {y = 800, speed = 120, direction = "up"}
 heightBar = {y = 840, speed = 120, direction = "up"}
 throwingChoice = "power"
 numOfStrokes = 0
 initialThrowAngle = 0
-hyzerAngle = .5
 mouse = {angle = 0, length = 200}
 x_translate_val = 0
 y_translate_val = 0
+
+timeFlying = 0
+timeGuess = 0
+
+zoomFactor = 1
+
+initialDirection = 0
+finalDirection = 0
 
 STATE = MAINMENU
 currentDisc = "Driver"
@@ -32,6 +40,8 @@ function love.load()
 	MenuHandler:loadMenus()
 	CollisionHandler:init()
 	CollisionHandler:default()
+	RecapHandler:init()
+	RecapHandler:default()
 
 	-- Add objects to collision handler
 	testColObj1 = {x = 64, y = 64, size = 64, height = 50}
@@ -44,16 +54,19 @@ function love.load()
 	CollisionHandler:addObject(testColObj3)
 	CollisionHandler:addObject(testColObj4)
 	CollisionHandler:addObject(testColObj5)
+
+	CollisionHandler:update()
 end
 
 function love.draw()
 
 	if STATE ~= MAINMENU then
-		x_translate_val = (love.graphics.getWidth() / 2) - disc.x
-		y_translate_val = (love.graphics.getHeight() / 2) - disc.y
+		x_translate_val = (love.graphics.getWidth() / 2) - disc.x * zoomFactor
+		y_translate_val = (love.graphics.getHeight() / 2) - disc.y * zoomFactor
 
 		love.graphics.push()
 		love.graphics.translate(x_translate_val, y_translate_val)
+		love.graphics.scale(zoomFactor)
 
 		CourseHandler:draw()
 
@@ -67,21 +80,23 @@ function love.draw()
 		--love.graphics.rectangle("fill", person.x - person.size/2, person.y - person.size/2, person.size, person.size)
 
 		love.graphics.setColor(disc.color)
-		love.graphics.circle("fill", disc.x, disc.y, disc.size + (disc.z - 5)/2)
+		love.graphics.circle("fill", disc.x, disc.y, disc.size + (disc.z - 5)/4)
 
 
 		love.graphics.pop()
 
-
+		love.graphics.setNewFont(12)
 		love.graphics.print("Disc Z: "..disc.z,10,10)
 		love.graphics.print("STATE: "..STATE, 10, 30)
 		love.graphics.print("Disc Location: "..disc.x..", "..disc.y, 10, 50)
 		love.graphics.print("Disc Selection: "..currentDisc, 10, 70)
 		love.graphics.print("Disc Angle: "..disc.velocity[1], 10, 90)
-		love.graphics.print("Hyzer Angle: "..hyzerAngle, 10, 110)
+		love.graphics.print("Disc Speed: "..disc.velocity[2] / 7 .. " ft/s", 10, 110)
 		love.graphics.print("Disc Height: "..disc.z, 10, 130)
+		love.graphics.print("Time Flying: "..timeFlying, 10, 150)
+		love.graphics.print("Time Guess: "..timeGuess, 10, 170)
 
-		love.graphics.print("Colliding : "..tostring(CollisionHandler.colliding), 10, 150)
+		love.graphics.print("Colliding : "..tostring(CollisionHandler.colliding), 10, 210)
 		--stroke counter stuff
 		----background
 		love.graphics.setColor(1, .5, 1)
@@ -118,6 +133,10 @@ function love.draw()
 			love.graphics.setColor(1, 1, 1)
 			love.graphics.line(800, 450, 800 + math.cos(mouse.angle) * mouse.length, 450 + math.sin(mouse.angle) * mouse.length)
 		end
+
+		if STATE == RECAP then
+			RecapHandler:draw()
+		end
 	else
 		love.graphics.setNewFont(24)
 		MenuHandler:draw()
@@ -129,43 +148,63 @@ end
 function love.update(dt)
 	if STATE ~= MAINMENU then
 		if STATE == FLYING then
+			zoomFactor = 20 / (disc.size + (disc.z - 5)/4)
+			if disc.z < 5 then
+				zoomFactor = 1
+			end
+			timeFlying = timeFlying + dt
 			local modx = math.cos(disc.velocity[1])
 			local mody = math.sin(disc.velocity[1])
 
-			disc.x = disc.x + BASESPEED * modx * disc.velocity[2] * dt
-			disc.y = disc.y + BASESPEED * mody * disc.velocity[2] * dt
+			disc.x = disc.x + modx * disc.velocity[2] * dt
+			disc.y = disc.y + mody * disc.velocity[2] * dt
 
-			disc.velocity[2] = disc.velocity[2] - disc.velocity[2] * .1 * dt
+			disc.velocity[2] = disc.velocity[2] - math.sqrt(disc.velocity[2]) * dt
+			if disc.velocity[2] < 0 then disc.velocity[2] = 0 end
 
 			disc.z = disc.z + disc.velocity[3] * dt
-			disc.velocity[3] = disc.velocity[3] - GRAVITY / (disc.glide / 7 * 2) * dt
 
-			--making the disc Hiezer
-			if hyzerAngle > 180 then
-				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-				hyzerAngle = hyzerAngle + .5 * hyzerAngle * dt
-				disc.z = disc.z + disc.velocity[3] * dt
-			elseif hyzerAngle > 90 then
-				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-				hyzerAngle = hyzerAngle + .8 * hyzerAngle * dt
-			elseif hyzerAngle > 30 then
-				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-				hyzerAngle = hyzerAngle + 1 * hyzerAngle * dt
+			-- Only when falling should we factor in glide.
+			if disc.velocity[3] < 0 then
+				disc.velocity[3] = disc.velocity[3] - GRAVITY * dt / (((disc.glide + 2) / 3) * (math.pi/2 - disc.noseAngle))
 			else
-				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-				hyzerAngle = hyzerAngle + 1.5 * hyzerAngle * dt
+				disc.velocity[3] = disc.velocity[3] - GRAVITY * dt
+			end
+			
+
+
+			-- Make the disc Hyzer
+			-- We want the disc to hyzer more based on how slow it is traveling compounded with its turn value
+			-- Higher turn value means that it doesn't flip much, and thus most overstable.
+
+
+			disc.velocity[1] = disc.velocity[1]
+
+			-- Normalize Disc Velocity vector to stay between -pi and pi
+			if disc.velocity[1] < -math.pi then
+				local difference = math.abs(disc.velocity[1] + math.pi)
+				disc.velocity[1] = math.pi - difference
+			elseif disc.velocity[1] > math.pi then
+				local difference = math.abs(disc.velocity[1] - math.pi)
+				disc.velocity[1] = -math.pi + difference
 			end
 
 			CollisionHandler:update(dt)
 
 
 			if disc.z < 0 then
-				disc.z = 5
-				STATE = THROWING
+				STATE = RECAP
+				finalPosition = {disc.x, disc.y}
+				recapTimer = 0
 				numOfStrokes = numOfStrokes + 1
-				hyzerAngle = .5
 				person.x = disc.x
 				person.y = disc.y
+				CollisionHandler.colliding = false
+				finalDirection = disc.velocity[1]
+				if initialDirection < -2.5 and finalDirection > 0 then 
+					finalDirection = -math.pi - (math.pi -  finalDirection)
+				end
+				print("The disc changed by " .. ((initialDirection - finalDirection) / (2*math.pi)) * 360 .. " degrees")
 			end
 		end
 
@@ -175,7 +214,7 @@ function love.update(dt)
 			local relX = x - x_translate_val
 			local relY = y - y_translate_val
 
-			mouse.angle = math.atan2(relY - person.y, relX - person.x)
+			mouse.angle = math.atan2(relY - disc.y, relX - disc.x)
 
 			if throwingChoice == "power" then
 				if powerBar.y > 840 then
@@ -208,6 +247,10 @@ function love.update(dt)
 			end
 
 		end
+
+		if STATE == RECAP then
+			RecapHandler:update(dt)
+		end
 	end
 end
 
@@ -217,22 +260,28 @@ function love.keypressed(key)
 			disc.color = {0,0,.75}
 			currentDisc = "Driver"
 			disc.glide = 7
+			disc.fade = 5
+			disc.turn = -1
 		end
 		if key == "2" then
 			disc.color = {1,.25, 0}
 			currentDisc = "MidRange"
 			disc.glide = 3.5
+			disc.fade = 3
+			disc.turn = 0
 		end
 		if key == "3" then
 			disc.color = {.8, .25, .56}
 			currentDisc = "Putter"
 			disc.glide = 1
+			disc.fade = 1
+			disc.turn = 0
 		end
 		if key == "space" then
 			if throwingChoice == "power" then
 				throwingChoice = "height"
 			elseif throwingChoice == "height" then
-				throwingChoice = "angle"
+				throwingChoice = "direction"
 			end
 		end
 	end
@@ -255,20 +304,38 @@ end
 
 function love.mousepressed(x,y,button)
 
-	if STATE == THROWING and button == 1 then
-		if throwingChoice == "angle" then
-			STATE = FLYING
-			throwingChoice = "power"
-			local relX = x - x_translate_val
-			local relY = y - y_translate_val
+	if STATE == THROWING and button == 1 and throwingChoice == "direction" then
+		timeFlying = 0
+		STATE = FLYING
+		throwingChoice = "power"
+		initialPosition = {disc.x, disc.y}
+		local relX = x - x_translate_val
+		local relY = y - y_translate_val
 
-			local angle = math.atan2(relY - person.y, relX - person.x)
-			initialThrowAngle = angle
+		local direction = math.atan2(relY - disc.y, relX - disc.x)
 
-			local discSpeed = math.abs((powerBar.y - 740) - 100) / 50
-			disc.velocity = {angle, discSpeed, (math.abs((heightBar.y - 740) - 100) / 2) + 5}
-			disc.x = person.x
-			disc.y = person.y
-		end
+		local releaseSpeed = math.abs(powerBar.y - 850) -- Will range from 10-100
+
+		local zVel = math.abs(heightBar.y - 840) / 90 -- Will range from 0 - 100
+
+		-- The height will be the height above throwing it flat.
+		-- There is no point in throwing straight up and down, so we will say we can throw it at a max of 80 degrees above flat.
+		local releaseAngle = zVel * (math.pi / 2)* 8 / 9
+
+		-- This is really tough because we don't factor in drag...
+		-- Now we factor in the disc speed... 
+		-- We want the disc to have the longest flight when it is thrown at 45 degrees?
+		zVel = math.sin(releaseAngle) * releaseSpeed
+
+		local discSpeed = math.cos(releaseAngle) * releaseSpeed * 7
+
+		disc.noseAngle = releaseAngle
+
+
+		disc.velocity = {direction, discSpeed, zVel}
+		initialDirection = direction
+	end
+	if STATE == RECAP and button == 1 and RecapHandler.finalMessage then
+		RecapHandler.skip = true
 	end
 end
