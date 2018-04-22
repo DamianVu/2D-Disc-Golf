@@ -12,6 +12,7 @@ disc = {x=500,y=500, z=5, size=20, velocity = {0,0,0}, glide = 7, color={0,0,.75
 powerBar = {y = 800, speed = 120, direction = "up"}
 heightBar = {y = 840, speed = 120, direction = "up"}
 throwingChoice = "power"
+numOfStrokes = 0
 initialThrowAngle = 0
 hyzerAngle = .5
 mouse = {angle = 0, length = 200}
@@ -60,19 +61,38 @@ function love.draw()
 		love.graphics.print("Hyzer Angle: "..hyzerAngle, 10, 110)
 		love.graphics.print("Disc Height: "..disc.z, 10, 130)
 
+		--stroke counter stuff
+		----background
+		love.graphics.setColor(1, .5, 1)
+		love.graphics.rectangle("fill", 1521, 820, 79, 80)
+		----words
+		love.graphics.setColor(.25, 0, .95)
+		love.graphics.print("# of Strokes", 1523, 820)
+		----stroke number
+		love.graphics.setNewFont(70)
+		love.graphics.print(numOfStrokes, 1540, 825)
+		love.graphics.setNewFont(12)
+
+
 		if STATE == THROWING then
-			love.graphics.setColor(.43, .95, .53)
+			--background rectangle
+			love.graphics.setColor(1, .5, 1)
+			love.graphics.rectangle("fill", 0, 730, 155, 120)
+
+			--powerBar
+			love.graphics.setColor(.25, 0, .95)
 			love.graphics.print("Power Bar", 10, 730)
 			love.graphics.rectangle("fill", 10, 750, 35, 100)
 
-			love.graphics.setColor(0, 0, 0)
+			love.graphics.setColor(.43, .95, .53)
 			love.graphics.rectangle("fill", 10, powerBar.y, 35, 10)
 
+			--heightBar
 			love.graphics.setColor(.25, 0, .95)
 			love.graphics.print("Height Bar", 90, 730)
 			love.graphics.rectangle("fill", 90, 750, 35, 100)
 
-			love.graphics.setColor(0, 0, 0)
+			love.graphics.setColor(.43, .95, .53)
 			love.graphics.rectangle("fill", 90, heightBar.y, 35, 10)
 
 			love.graphics.setColor(1, 1, 1)
@@ -120,6 +140,7 @@ function love.update(dt)
 			if disc.z < 0 then
 				disc.z = 5
 				STATE = THROWING
+				numOfStrokes = numOfStrokes + 1
 				hyzerAngle = .5
 				person.x = disc.x
 				person.y = disc.y
@@ -148,7 +169,7 @@ function love.update(dt)
 						powerBar.y = powerBar.y - powerBar.speed * dt
 					end
 		 		end
-			else
+			elseif throwingChoice == "height" then
 				if heightBar.y > 840 then
 					heightBar.y = heightBar.y - heightBar.speed * dt
 					heightBar.direction = "down"
@@ -176,14 +197,21 @@ function love.keypressed(key)
 			disc.glide = 7
 		end
 		if key == "2" then
-			disc.color = {0,.25, 0}
+			disc.color = {1,.25, 0}
 			currentDisc = "MidRange"
 			disc.glide = 3.5
 		end
 		if key == "3" then
-			disc.color = {.5,0, .6}
+			disc.color = {.8, .25, .56}
 			currentDisc = "Putter"
 			disc.glide = 1
+		end
+		if key == "space" then
+			if throwingChoice == "power" then
+				throwingChoice = "height"
+			elseif throwingChoice == "height" then
+				throwingChoice = "angle"
+			end
 		end
 	end
 
@@ -206,10 +234,7 @@ end
 function love.mousepressed(x,y,button)
 
 	if STATE == THROWING and button == 1 then
-		if throwingChoice == "power" then
-			throwingChoice = "height"
-		else
-
+		if throwingChoice == "angle" then
 			STATE = FLYING
 			throwingChoice = "power"
 			local relX = x - x_translate_val
