@@ -11,7 +11,7 @@ powerBar = {y = 800, speed = 120, direction = "up"}
 heightBar = {y = 840, speed = 120, direction = "up"}
 throwingChoice = "power"
 initialThrowAngle = 0
-hyzerAngle = .005
+hyzerAngle = .5
 mouse = {angle = 0, length = 200}
 x_translate_val = 0
 y_translate_val = 0
@@ -96,10 +96,16 @@ function love.update(dt)
 		if hyzerAngle > 180 then
 			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
 			hyzerAngle = hyzerAngle + .5 * hyzerAngle * dt
-			--disc.velocity[3] = disc.velocity[3] + disc.velocity[3]*.5
+			disc.z = disc.z + disc.velocity[3] * dt
+		elseif hyzerAngle > 90 then
+			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
+			hyzerAngle = hyzerAngle + .8 * hyzerAngle * dt
+		elseif hyzerAngle > 30 then
+			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
+			hyzerAngle = hyzerAngle + 1 * hyzerAngle * dt
 		else
 			disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
-			hyzerAngle = hyzerAngle + 2 * hyzerAngle * dt
+			hyzerAngle = hyzerAngle + 1.5 * hyzerAngle * dt
 		end
 
 
