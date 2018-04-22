@@ -36,8 +36,13 @@ function menuhandler:draw()
 			local item = options[i][1]
 			local w, h = love.graphics.getDimensions()
 			if i == self.selection then
+				love.graphics.setColor(0,0,.3)
 				love.graphics.print(item, w/2 - 101, h/4 + offset - 1)
+				love.graphics.print(item, w/2 - 101, h/4 + offset + 1)
+				love.graphics.print(item, w/2 - 99, h/4 + offset - 1)
+				love.graphics.print(item, w/2 - 99, h/4 + offset + 1)
 			end
+			love.graphics.setColor(.9373, .9373, .9373)
 			love.graphics.print(item, w/2 - 100, h/4 + offset)
 			offset = offset + 60
 		end

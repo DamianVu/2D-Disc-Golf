@@ -6,6 +6,7 @@ basket = love.graphics.newImage("images/sprites/Basket.png")
 CourseHandler = require "handlers.courseHandler"
 MenuHandler = require "handlers.menuhandler"
 RoundHandler = require "handlers.roundhandler"
+CollisionHandler = require "handlers.collisionHandler"
 
 person = {x = 500, y = 500, size = 60, color = {1,1,0}}
 disc = {x=500,y=500, z=5, size=20, velocity = {0,0,0}, glide = 7, color={0,0,.75}}
@@ -28,6 +29,20 @@ function love.load()
 	CourseHandler:load()
 	MenuHandler:init()
 	MenuHandler:loadMenus()
+	CollisionHandler:init()
+	CollisionHandler:default()
+
+	-- Add objects to collision handler
+	testColObj1 = {x = 64, y = 64, size = 64, height = 50}
+	testColObj2 = {x = 1028, y = 128, size = 64, height = 30}
+	testColObj3 = {x = 512, y = 64, size = 64, height = 120}
+	testColObj4 = {x = 128, y = 128, size = 64, height = 40}
+	testColObj5 = {x = 256, y = 1028, size = 64, height = 80}
+	CollisionHandler:addObject(testColObj1)
+	CollisionHandler:addObject(testColObj2)
+	CollisionHandler:addObject(testColObj3)
+	CollisionHandler:addObject(testColObj4)
+	CollisionHandler:addObject(testColObj5)
 end
 
 function love.draw()
@@ -41,13 +56,18 @@ function love.draw()
 
 		CourseHandler:draw()
 
+		CollisionHandler:drawCollisionObjects()
+		CollisionHandler:drawObjectHeights()
+
 		love.graphics.print("Hello",400,400)
 
-		love.graphics.setColor(disc.color)
-		love.graphics.circle("fill", disc.x - disc.size/2, disc.y - disc.size/2, disc.size + disc.z/2)
 
 		love.graphics.setColor(person.color)
-		love.graphics.rectangle("fill", person.x - person.size/2, person.y - person.size/2, person.size, person.size)
+		--love.graphics.rectangle("fill", person.x - person.size/2, person.y - person.size/2, person.size, person.size)
+
+		love.graphics.setColor(disc.color)
+		love.graphics.circle("fill", disc.x, disc.y, disc.size + (disc.z - 5)/2)
+
 
 		love.graphics.pop()
 
@@ -59,6 +79,8 @@ function love.draw()
 		love.graphics.print("Disc Angle: "..disc.velocity[1], 10, 90)
 		love.graphics.print("Hyzer Angle: "..hyzerAngle, 10, 110)
 		love.graphics.print("Disc Height: "..disc.z, 10, 130)
+
+		love.graphics.print("Colliding : "..tostring(CollisionHandler.colliding), 10, 150)
 
 		if STATE == THROWING then
 			love.graphics.setColor(.43, .95, .53)
@@ -115,6 +137,8 @@ function love.update(dt)
 				disc.velocity[1] = initialThrowAngle - hyzerAngle * dt
 				hyzerAngle = hyzerAngle + 1.5 * hyzerAngle * dt
 			end
+
+			CollisionHandler:update(dt)
 
 
 			if disc.z < 0 then

@@ -9,6 +9,10 @@ function roundhandler:init()
 	return obj
 end
 
+function roundhandler:initialize()
+
+end
+
 function roundhandler:start()
 	
 end
