@@ -72,6 +72,10 @@ function coursehandler:createCanvas()
 				sb:add((i - 1) * 64,(j - 1) * 64)
 			else
 				love.graphics.draw(self.tilesets[1], self.quads[1][self.map.grid[j - 3][i - 3]], (i - 1) * 64, (j - 1) * 64)
+				if( self.map.grid[j - 3][i - 3] == 7) then
+					testColObj1 = {x = ((i - 1) * 64), y = ((j - 1) * 64), size = 64, height = 69}
+					CollisionHandler:addObject(testColObj1)
+				end
 			end
 		end
 	end
