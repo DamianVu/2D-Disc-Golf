@@ -4,7 +4,8 @@ coursehandler = {}
 function coursehandler:init()
 	obj = {
 		tilesets = {},
-		quads = {}
+		quads = {},
+		trees = {}
 	}
 	setmetatable(obj,self)
 	self.__index = self

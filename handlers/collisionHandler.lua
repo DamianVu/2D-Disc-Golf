@@ -19,6 +19,12 @@ function collisionhandler:addObject(object)
 	self.objects[#self.objects + 1] = object
 end
 
+function collisionhandler:removeObjects()
+	for i = 1, #self.objects do
+		table.remove(self.objects)
+	end
+end
+
 function collisionhandler:update(dt)
 	-- Only need to check collision from disc to objects. Nice, that's only N operations.
 	-- The circle is round
@@ -90,9 +96,9 @@ function collisionhandler:checkCollision(object)
 
 		local innerCircleRadius = oSize / 2
 
-		
 
-		
+
+
 		if distanceBetweenCenters < innerCircleRadius + disc.size then
 			return true, 1
 		end
