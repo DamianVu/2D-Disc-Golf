@@ -3,7 +3,7 @@
 ## Overview
 This game was developed by [Damian Vu](https://github.com/DamianVu) and [Andy Kunz](https://github.com/Kunzy83). Initially this project was developed in a 24 hour time period for the [HackKU](http://hackku.org/) 2018 Hackathon. We plan to continue work on this project and make it less of a "hack" and follow better and more efficient standards. [v0.1-alpha](https://github.com/DamianVu/2D-Disc-Golf/releases/tag/v0.1-alpha) is the version we developed for the hackathon. Any following version will contain code/changes implemented after the event. Our project took 2nd place in the hackathon.
 
-## Current Version: v0.1-alpha
+## Current Version: [v0.1-alpha](https://github.com/DamianVu/2D-Disc-Golf/releases/tag/v0.1-alpha)
 ### Summary:
 This release marks end of submissions after the HackKU Event that ran from April 20-22. This event was a 24 hour long hackathon that us two Computer Science Undergraduates: Damian Vu and Andrew (Andy) Kunz worked on.
 
