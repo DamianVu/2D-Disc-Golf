@@ -22,6 +22,10 @@ mouse = {angle = 0, length = 200}
 x_translate_val = 0
 y_translate_val = 0
 
+--used for keeping track of where the user scrolls aorund the map in the MAPSEARCH state
+x_mapScroll_val = 0
+y_mapScroll_val = 0
+
 timeFlying = 0
 timeGuess = 0
 
@@ -67,8 +71,16 @@ end
 function love.draw()
 
 	if STATE ~= MAINMENU then
-		x_translate_val = (w / 2) - disc.x * zoomFactor
-		y_translate_val = (h / 2) - disc.y * zoomFactor
+		--code to keep the screen centered where we want it
+		if STATE ~= MAPSEARCH then
+			--screen centers on disc
+			x_translate_val = (w / 2) - disc.x * zoomFactor
+			y_translate_val = (h / 2) - disc.y * zoomFactor
+		else
+			--screen centers on where the user scrolls while viewing the map in the MAPSEARCH state
+			x_translate_val = (w / 2) - x_mapScroll_val * zoomFactor
+			y_translate_val = (h / 2) - y_mapScroll_val * zoomFactor
+		end
 
 		love.graphics.push()
 		love.graphics.translate(x_translate_val, y_translate_val)
@@ -138,6 +150,49 @@ function love.draw()
 
 		if STATE == RECAP then
 			RecapHandler:draw()
+		end
+
+		if STATE == MAPSEARCH then
+		--creating Map Scroll menu
+			--creating boarders
+			love.graphics.setColor(1,.5,.15)
+			love.graphics.setNewFont(45)
+			love.graphics.print("Map Search", 1336, 10)
+			love.graphics.print("Map Search", 1334, 10)
+			love.graphics.print("Map Search", 1335, 11)
+			love.graphics.print("Map Search", 1335, 9)
+
+			love.graphics.setNewFont(18)
+			love.graphics.print("Use arrow keys to navigate", 1351, 60)
+			love.graphics.print("Use arrow keys to navigate", 1349, 60)
+			love.graphics.print("Use arrow keys to navigate", 1350, 61)
+			love.graphics.print("Use arrow keys to navigate", 1350, 59)
+
+			love.graphics.print("Press + to zoom in", 1351, 90)
+			love.graphics.print("Press + to zoom in", 1349, 90)
+			love.graphics.print("Press + to zoom in", 1350, 91)
+			love.graphics.print("Press + to zoom in", 1350, 89)
+
+			love.graphics.print("Press - to zoom out", 1351, 120)
+			love.graphics.print("Press - to zoom out", 1349, 120)
+			love.graphics.print("Press - to zoom out", 1350, 121)
+			love.graphics.print("Press - to zoom out", 1350, 119)
+
+			love.graphics.print("Press Z to leave", 1351, 150)
+			love.graphics.print("Press Z to leave", 1349, 150)
+			love.graphics.print("Press Z to leave", 1350, 151)
+			love.graphics.print("Press Z to leave", 1350, 149)
+
+			--printing menu items
+			love.graphics.setColor(0,0,0)
+			love.graphics.setNewFont(45)
+			love.graphics.print("Map Search", 1335, 10)
+			love.graphics.setNewFont(18)
+			love.graphics.print("Use arrow keys to navigate", 1350, 60)
+			love.graphics.print("Press + to zoom in", 1350, 90)
+			love.graphics.print("Press - to zoom out", 1350, 120)
+			love.graphics.print("Press Z to leave", 1350, 150)
+			love.graphics.setNewFont(12)
 		end
 
 		if STATE == PAUSED then
@@ -281,6 +336,41 @@ end
 function love.keypressed(key)
 	if key == "d" then
 		DebugHandler:toggle()
+	end
+
+	if key == "z" then
+		if STATE == THROWING then
+			--initialize map scrolling capabilities
+			STATE = MAPSEARCH
+			--starts user scrolling location at disc location
+			x_mapScroll_val = disc.x
+			y_mapScroll_val = disc.y
+		elseif STATE == MAPSEARCH then
+			--end map scrolling capapbilities
+			zoomFactor = 1
+			STATE = THROWING
+		end
+	end
+
+	if STATE == MAPSEARCH then
+		if key == "kp+" then --zoom in
+			zoomFactor = zoomFactor + .1
+		end
+		if key == "kp-" then --zoom out
+			zoomFactor = zoomFactor - .1
+		end
+		if key == "up" then --scroll up
+			y_mapScroll_val = y_mapScroll_val - 100
+		end
+		if key == "down" then --scroll down
+			y_mapScroll_val = y_mapScroll_val + 100
+		end
+		if key == "right" then --scroll right
+			x_mapScroll_val = x_mapScroll_val + 100
+		end
+		if key == "left" then --scroll left
+			x_mapScroll_val = x_mapScroll_val - 100
+		end
 	end
 	if STATE == THROWING then
 		if key == "1" then
