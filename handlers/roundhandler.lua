@@ -18,6 +18,7 @@ function roundhandler:start()
 	self.currentHole = 1
 	STATE = THROWING
 	CourseHandler:load("centennial")
+	self.courseName = "Centennial Park"
 	CourseHandler:setHole(1)
 	self.canvas = CourseHandler:createCanvas()
 end

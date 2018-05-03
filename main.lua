@@ -104,16 +104,62 @@ function love.draw()
 		love.graphics.pop()
 
 		DebugHandler:draw()
-		--stroke counter stuff
-		----background
-		love.graphics.setColor(1, .5, 1)
-		love.graphics.rectangle("fill", 1500, 800, 100, 100)
+		--display round information about course name, current hole, and number of strokes
+		--background
+		love.graphics.setColor(.3, .7, .5, .75)
+		love.graphics.rectangle("fill", 588, 850, 424, 50)
+		--course name boarder
+		love.graphics.setNewFont(35)
+		love.graphics.setColor(1,.5,.15)
+		love.graphics.print(RoundHandler.courseName, 591, 855)
+		love.graphics.print(RoundHandler.courseName, 589, 855)
+		love.graphics.print(RoundHandler.courseName, 590, 856)
+		love.graphics.print(RoundHandler.courseName, 590, 854)
+		--course name
+		love.graphics.setColor(.25, 0, .95)
+		love.graphics.print(RoundHandler.courseName, 590, 855)
+		love.graphics.setNewFont(16)
+		--stroke counter display information
+		--words boarder
+		love.graphics.setColor(1,.5,.15)
+		love.graphics.print("Stroke #", 941, 850)
+		love.graphics.print("Stroke #", 939, 850)
+		love.graphics.print("Stroke #", 940, 851)
+		love.graphics.print("Stroke #", 940, 849)
 		----words
 		love.graphics.setColor(.25, 0, .95)
-		love.graphics.print("# of Strokes", 1500, 800)
+		love.graphics.print("Stroke #", 940, 850)
+		--stroke number boarder
+		love.graphics.setColor(1,.5,.15)
+		love.graphics.setNewFont(25)
+		love.graphics.print(numOfStrokes, 961, 865)
+		love.graphics.print(numOfStrokes, 959, 865)
+		love.graphics.print(numOfStrokes, 960, 866)
+		love.graphics.print(numOfStrokes, 960, 864)
 		----stroke number
-		love.graphics.setNewFont(70)
-		love.graphics.print(numOfStrokes, 1505, 820)
+		love.graphics.setColor(.25, 0, .95)
+		love.graphics.print(numOfStrokes, 960, 865)
+		love.graphics.setNewFont(16)
+		--hole number display information
+		--words boarder
+		love.graphics.setColor(1,.5,.15)
+		love.graphics.print("hole #", 876, 850)
+		love.graphics.print("hole #", 874, 850)
+		love.graphics.print("hole #", 875, 851)
+		love.graphics.print("hole #", 875, 849)
+		----words
+		love.graphics.setColor(.25, 0, .95)
+		love.graphics.print("hole #", 875, 850)
+		--hole number boarder
+		love.graphics.setNewFont(25)
+		love.graphics.setColor(1,.5,.15)
+		love.graphics.print(RoundHandler.currentHole, 891, 865)
+		love.graphics.print(RoundHandler.currentHole, 889, 865)
+		love.graphics.print(RoundHandler.currentHole, 890, 866)
+		love.graphics.print(RoundHandler.currentHole, 890, 864)
+		----hole number
+		love.graphics.setColor(.25, 0, .95)
+		love.graphics.print(RoundHandler.currentHole, 890, 865)
 		love.graphics.setNewFont(12)
 
 		if STATE == THROWING then
@@ -154,7 +200,10 @@ function love.draw()
 
 		if STATE == MAPSEARCH then
 		--creating Map Scroll menu
-			--creating boarders
+			--creating background for menu
+			love.graphics.setColor(.3, .7, .5, .75)
+			love.graphics.rectangle("fill", 1330, 9, 270, 170)
+			--creating boarders for menu items
 			love.graphics.setColor(1,.5,.15)
 			love.graphics.setNewFont(45)
 			love.graphics.print("Map Search", 1336, 10)
